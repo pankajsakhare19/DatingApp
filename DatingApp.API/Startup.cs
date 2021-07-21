@@ -19,6 +19,7 @@ using System.Net;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using DatingApp.API.Helpers;
+using Newtonsoft.Json;
 
 namespace DatingApp.API
 {
@@ -35,12 +36,21 @@ namespace DatingApp.API
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<DataContext>(
-                options=> options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+                options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             services.AddControllers();
+
+            services.AddMvc().AddNewtonsoftJson(o =>
+                        {
+                            o.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+                        });
+
             services.AddCors();
+            services.AddAutoMapper(typeof(DatingRepository).Assembly);
             services.AddScoped<IAuthRepository, AuthRepository>();
+            services.AddScoped<IDatingRepository, DatingRepository>();
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            .AddJwtBearer(options => {
+            .AddJwtBearer(options =>
+            {
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuerSigningKey = true,
@@ -60,14 +70,18 @@ namespace DatingApp.API
             {
                 app.UseDeveloperExceptionPage();
             }
-            else{
-                app.UseExceptionHandler(builder =>{
-                    builder.Run(async context=>{
+            else
+            {
+                app.UseExceptionHandler(builder =>
+                {
+                    builder.Run(async context =>
+                    {
                         context.Response.StatusCode =
                         (int)HttpStatusCode.InternalServerError;
-                         
-                        var error = context.Features.Get<IExceptionHandlerFeature>(); 
-                        if(error != null){
+
+                        var error = context.Features.Get<IExceptionHandlerFeature>();
+                        if (error != null)
+                        {
                             context.Response.AddApplicationError(error.Error.Message);
                             await context.Response.WriteAsync(error.Error.Message);
                         }
