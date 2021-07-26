@@ -18,7 +18,7 @@ import { appRoutes } from './routes';
 import { MemberCardComponent } from './members/member-list/member-card/member-card.component';
 import { JwtModule } from '@auth0/angular-jwt';
 import { MemberDetailComponent } from './members/member-detail/member-detail.component';
-import { BsDatepickerModule, TabsModule } from 'ngx-bootstrap';
+import { BsDatepickerModule, ButtonsModule, PaginationModule, TabsModule } from 'ngx-bootstrap';
 import { MemberDetailResolver } from './_resolvers/member-detail.resolver';
 import { AlertifyService } from './_services/alertify.service';
 import { AuthGuard } from './_guards/auth.guard';
@@ -30,6 +30,7 @@ import { MemberEditResolver } from './_resolvers/member-edit.resolver';
 import { PreventUnsavedChanges } from './_guards/prevent-unsaved-changes.guard';
 import { PhotoEditorComponent } from './members/photo-editor/photo-editor.component';
 import { FileUploadModule } from 'ng2-file-upload';
+import { TimeAgoPipe } from 'time-ago-pipe';
 
 export function tokenGetter(){
   return localStorage.getItem('token');
@@ -56,6 +57,7 @@ export class CustomHammerConfig extends HammerGestureConfig{
       MemberDetailComponent,
       MemberEditComponent,
       PhotoEditorComponent,
+      TimeAgoPipe
    ],
   imports: [
     BrowserModule,
@@ -69,6 +71,8 @@ export class CustomHammerConfig extends HammerGestureConfig{
     NgxGalleryModule,
     FileUploadModule,
     ReactiveFormsModule,
+    ButtonsModule.forRoot(),
+    PaginationModule.forRoot(),
     JwtModule.forRoot({
       config: {
         tokenGetter: tokenGetter,
